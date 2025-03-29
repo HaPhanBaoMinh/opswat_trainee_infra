@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket       = "opswat-trainee-project-s3-backend"
-    key          = "OPSWAT-project"
-    region       = "us-east-1"
+    bucket = "opswat-trainee-project-backend"
+    key    = "OPSWAT-project-infra"
+    region = "ap-southeast-1"
     assume_role = {
       role_arn = "arn:aws:iam::026090549419:role/Opswat-Trainee-ProjectS3BackendRole"
     }
