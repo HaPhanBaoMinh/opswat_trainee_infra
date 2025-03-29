@@ -7,7 +7,7 @@ variable "ami_id" {
 variable "cluster_name" {
   description = "The name of the EKS cluster"
   type        = string
-  default     = "OPSWAT-Trainee-Project"
+  default     = "OPSWAT-Trainee-Project-EKS"
 }
 
 variable "region" {
