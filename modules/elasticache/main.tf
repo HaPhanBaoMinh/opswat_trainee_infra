@@ -38,7 +38,7 @@ resource "aws_elasticache_replication_group" "redis_replication_group" {
   replication_group_id       = "${var.name}-${var.environment}-redis"
   description                = "Redis replication group for ${var.name} in ${var.environment} environment"
   node_type                  = var.redis_node_type
-  engine_version             = "7.1"  
+  engine_version             = "7.1"
   engine                     = "redis"
   parameter_group_name       = "default.redis7"
   automatic_failover_enabled = false

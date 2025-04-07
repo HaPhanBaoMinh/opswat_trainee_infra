@@ -77,4 +77,34 @@ variable "allowed_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
+# CI/CD module variables
+variable "services" {
+  description = "Map of services to deploy"
+  type        = map(string)
+}
 
+variable "github_owner" {
+  description = "GitHub owner (username or organization)"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+}
+
+variable "codestar_connection_arn" {
+  description = "ARN of the AWS CodeStar connection for GitHub"
+  type        = string
+}
+
+variable "github_branch" {
+  description = "GitHub branch to use for the pipeline"
+  type        = string
+  default     = "main"
+}
+
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+}
