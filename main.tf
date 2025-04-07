@@ -1,61 +1,39 @@
-terraform {
-  backend "s3" {
-    bucket = "opswat-trainee-project-backend"
-    key    = "OPSWAT-project-infra"
-    region = "ap-southeast-1"
-    assume_role = {
-      role_arn = "arn:aws:iam::026090549419:role/Opswat-Trainee-ProjectS3BackendRole"
-    }
-  }
-}
 
-// VPC
-module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-
-  name = var.cluster_name
-  cidr = "10.0.0.0/16"
-
-  azs             = var.availability_zones
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-
-  enable_nat_gateway = true
-  single_nat_gateway = true
-
-  tags = {
-    Terraform   = "true"
-    Environment = var.environment
-  }
-}
-
-// EKS 
+# EKS Cluster Module
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
-
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
-  vpc_id          = module.vpc.vpc_id
-  subnet_ids      = module.vpc.private_subnets
-
-  cluster_endpoint_public_access = true
-  enable_cluster_creator_admin_permissions = true
-
-  eks_managed_node_groups = {
-    eks_nodes = {
-      instance_type = var.instance_type[0]
-      desired_size  = var.desired_size
-      max_size      = var.max_size
-      min_size      = var.min_size
-      ami_type      = var.ami_id
-      capacity_type = "SPOT"
-    }
-  }
-
-  tags = {
-    Terraform   = "true"
-    Environment = var.environment
-  }
+  source                    = "./modules/eks"
+  name                      = "${var.name}-eks-cluster"
+  node_group_name           = "${var.name}-node-group"
+  instance_types            = ["t3.medium"]
+  node_group_size           = 1
+  node_group_max_size       = 2
+  node_group_min_size       = 1
+  environment               = var.environment
+  capacity_type             = "SPOT"
+  additional_instance_types = ["t3.medium"]
+  tags                      = var.tags
+  availability_zones        = var.availability_zones
+  enable_nat_gateway        = var.enable_nat_gateway
 }
 
+module "rds" {
+  source              = "./modules/rds"
+  db_name             = "${var.name}-rds"
+  environment         = var.environment
+  subnet_ids          = module.eks.private_subnet_ids
+  vpc_id              = module.eks.vpc_id
+  allowed_cidr_blocks = var.allowed_cidr_blocks
+  db_port             = var.db_port
+  db_instance_class   = var.db_instance_class
+}
+
+
+module "elasticache" {
+  source              = "./modules/elasticache"
+  name                = "${var.name}-redis"
+  environment         = var.environment
+  vpc_id              = module.eks.vpc_id
+  redis_subnet_ids    = module.eks.private_subnet_ids
+  allowed_cidr_blocks = var.allowed_cidr_blocks
+  redis_subnet_group_name = "${var.name}-${var.environment}-redis-subnet-group"
+}

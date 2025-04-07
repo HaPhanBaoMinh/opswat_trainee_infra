@@ -1,66 +1,80 @@
-variable "ami_id" {
-  description = "The AMI ID"
-  type        = string
-  default     = "AL2023_x86_64_STANDARD"
-}
-
-variable "cluster_name" {
-  description = "The name of the EKS cluster"
-  type        = string
-  default     = "OPSWAT-Trainee-Project-EKS"
-}
-
-variable "region" {
-  description = "The AWS region"
-  type        = string
-  default     = "ap-southeast-1"
-}
-
-variable "availability_zones" {
-  description = "The availability zones"
-  type        = list(string)
-  default     = ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]
-}
-
-variable "cluster_version" {
-  description = "The EKS cluster version"
-  type        = string
-  default     = "1.31"
-}
-
-variable "instance_type" {
-  description = "The instance type"
+# EKS module variables
+variable "instance_types" {
+  description = "List of instance types for the EKS node group"
   type        = list(string)
   default     = ["t3.medium"]
 }
 
-variable "min_size" {
-  description = "The minimum size of the worker group"
+variable "node_group_size" {
+  description = "Desired size of the EKS node group"
   type        = number
   default     = 1
 }
 
-variable "max_size" {
-  description = "The maximum size of the worker group"
+variable "node_group_max_size" {
+  description = "Maximum size of the EKS node group"
   type        = number
   default     = 3
 }
 
-variable "desired_size" {
-  description = "The desired size of the worker group"
+variable "node_group_min_size" {
+  description = "Minimum size of the EKS node group"
   type        = number
   default     = 1
 }
 
-variable "environment" {
-  description = "The environment"
+variable "capacity_type" {
+  description = "Capacity type for the EKS node group (ON_DEMAND or SPOT)"
   type        = string
-  default     = "dev"
+  default     = "ON_DEMAND"
 }
 
-variable "account_id" {
-  description = "The AWS account ID"
-  type        = string
-  default     = "026090549419"
-
+variable "aks_tags" {
+  description = "Tags to apply to the EKS resources"
+  type        = map(string)
+  default     = {}
 }
+
+variable "additional_instance_types" {
+  description = "Additional instance types for the EKS node group"
+  type        = list(string)
+  default     = []
+}
+
+variable "tags" {
+  description = "Tags to apply to the EKS node group"
+  type        = map(string)
+  default     = {}
+}
+
+variable "enable_nat_gateway" {
+  description = "Enable NAT Gateway for private subnets"
+  type        = bool
+  default     = false
+}
+
+# RDS module variables
+variable "db_instance_class" {
+  description = "The instance class for the RDS instance"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_name" {
+  description = "The name of the database"
+  type        = string
+}
+
+variable "db_port" {
+  description = "The port on which the database is listening"
+  type        = number
+  default     = 3306
+}
+
+variable "allowed_cidr_blocks" {
+  description = "The CIDR blocks that are allowed to access the RDS instance"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+
